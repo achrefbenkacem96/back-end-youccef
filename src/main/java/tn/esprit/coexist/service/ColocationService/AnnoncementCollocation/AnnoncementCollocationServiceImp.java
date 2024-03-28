@@ -272,7 +272,7 @@ public class AnnoncementCollocationServiceImp implements ICRUDService<Annoncemen
             AnnoncementCollocation announcement = announcementOptional.get();
 
             // Check if the announcement belongs to the specified user
-            if (announcement.getUser().getUserId().equals(userId)) {
+
                 // Create a map representation of the announcement
                 Map<String, Object> announcementMap = new HashMap<>();
                 List<CollocationBooking> bookings = collocationBookingRepository.findByAnnoncementCollocationAnnoncementCollocationId(announcementId);
@@ -335,10 +335,7 @@ public class AnnoncementCollocationServiceImp implements ICRUDService<Annoncemen
                 // Handle case where the announcement does not belong to the specified user
                 return null;
             }
-        } else {
-            // Handle case where the announcement does not exist
-            return null;
-        }
+
     }
     public  List<Map<String, Object>> getArchivedAnnouncementsByUserId(int userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
