@@ -9,6 +9,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import org.springframework.web.client.RestTemplate;
 import tn.esprit.coexist.entity.ColocationEntity.AnnoncementCollocation;
 import tn.esprit.coexist.entity.ColocationEntity.CollocationBooking;
 import tn.esprit.coexist.entity.ColocationEntity.StatusType;
@@ -99,23 +100,20 @@ public class BookingCollocationServiceImp implements ICRUDService<CollocationBoo
     }
     public void sendEmail2(String email) {
         try {
-            MimeMessage message = emailSender.createMimeMessage();
-            boolean multipart = true;
-            MimeMessageHelper helper = new MimeMessageHelper(message, multipart, "utf-8");
 
             String htmlMsg =
                     " <h3>bonjour<h3>"+
                             "<h2>updated  " +
                             "<h3>cordianelemt<h3>" ;
 
-            message.setContent(htmlMsg, "text/html");
-            helper.setTo(email);
-            helper.setSubject("Booking");
-            this.emailSender.send(message);
-        } catch (MessagingException e) {
+            RestTemplate restTemplate = new RestTemplate();
+            String apiUrl = "https://smtp-vuah.onrender.com/sendEmail?to="+email+"&subject=Update Booking&html="+htmlMsg;
 
+            restTemplate.getForEntity(apiUrl, null, String.class);
+        } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
     public List<CollocationBooking> findBookingsByAnnouncementId(Integer announcementId) {
         return collocationBookingRepository.findByAnnoncementCollocationAnnoncementCollocationId(announcementId);
@@ -135,22 +133,17 @@ public class BookingCollocationServiceImp implements ICRUDService<CollocationBoo
     }
     public void sendEmail(String email) {
         try {
-            MimeMessage message = emailSender.createMimeMessage();
-            boolean multipart = true;
-            MimeMessageHelper helper = new MimeMessageHelper(message, multipart, "utf-8");
-
             String htmlMsg =
                     " <h3>bonjour<h3>"+
                             "<h2>famaaaa hajaa  " +
                             "<h3>cordianelemt<h3>" ;
 
-            message.setContent(htmlMsg, "text/html");
-            helper.setTo(email);
-            helper.setSubject("Booking");
-            this.emailSender.send(message);
-        } catch (MessagingException e) {
+            RestTemplate restTemplate = new RestTemplate();
+            String apiUrl = "https://smtp-vuah.onrender.com/sendEmail?to="+email+"&subject=Booking&html="+htmlMsg;
 
+            restTemplate.getForEntity(apiUrl, null, String.class);
+        } catch (Exception e) {
             e.printStackTrace();
         }
-    }
 }
+    }
