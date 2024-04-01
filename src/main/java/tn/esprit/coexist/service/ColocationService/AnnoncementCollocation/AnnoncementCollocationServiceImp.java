@@ -259,6 +259,53 @@ public class AnnoncementCollocationServiceImp implements ICRUDService<Annoncemen
             return null;
         }
     }
+    public AnnoncementCollocation update(Integer id, AnnoncementCollocation Classe1, List<FileDB> images) {
+        logger.info("Updating AnnoncementCollocation with ID: {}", id);
+
+        Optional<AnnoncementCollocation> existingSubjectOptional = annoncementCollocationRepository.findById(id);
+
+        if (existingSubjectOptional.isPresent()) {
+            AnnoncementCollocation existingSubject = existingSubjectOptional.get();
+            logger.debug("Found existing AnnoncementCollocation: {}", existingSubject);
+
+            String newAddress = Classe1.getAddress();
+            existingSubject.setAddress(newAddress);
+            logger.info("Address updated to: {}", Classe1.getEquipmentType());
+            EquipmentType equipmentType = Classe1.getEquipmentType();
+            existingSubject.setEquipmentType(equipmentType);
+            logger.info("equipmentType updated to: {}", Classe1.getPricePerPerson());
+            Float price = Classe1.getPricePerPerson();
+            existingSubject.setPricePerPerson(price);
+            logger.info("price updated to: {}", Classe1.getHomeSize());
+            Integer homeSize = Classe1.getHomeSize();
+            existingSubject.setHomeSize(homeSize);
+            logger.info("homeSize updated to: {}", Classe1.getHouseType());
+            HouseType houseType = Classe1.getHouseType();
+            existingSubject.setHouseType(houseType);
+            logger.info("etat updated to: {}", Classe1.getEtat());
+            Etat etat = Classe1.getEtat();
+            existingSubject.setEtat(etat);
+            logger.info("houseType updated to: {}", newAddress);
+            Integer numPerso = Classe1.getNumPerso();
+            existingSubject.setNumPerso(numPerso);
+            logger.info("numPerso updated to: {}", newAddress);
+            //List<FileDB> image = Classe1.getImages();
+            if (images != null) {
+                existingSubject.setImages(images);
+            }
+            logger.info("image updated to: {}", newAddress);
+
+
+            AnnoncementCollocation updatedAnnoncement = annoncementCollocationRepository.save(existingSubject);
+            logger.info("AnnoncementCollocation updated successfully: {}", updatedAnnoncement);
+
+            return updatedAnnoncement;
+        } else {
+            logger.warn("AnnoncementCollocation with ID {} not found", id);
+            return null;
+        }
+    }
+
     @Override
     public AnnoncementCollocation getAnnouncementById(Integer id) {
         Optional<AnnoncementCollocation> announcementOptional = annoncementCollocationRepository.findById(id);
@@ -449,7 +496,7 @@ public class AnnoncementCollocationServiceImp implements ICRUDService<Annoncemen
 
     }
 
-    public void deleteOldPhoto(Integer announcementId, String oldPhotoId) {
+    public List<FileDB> deleteOldPhoto(Integer announcementId, String oldPhotoId) {
         // Retrieve the announcement from the repository based on its ID
         Optional<AnnoncementCollocation> optionalAnnouncement = annoncementCollocationRepository.findById(announcementId);
 
@@ -459,11 +506,19 @@ public class AnnoncementCollocationServiceImp implements ICRUDService<Annoncemen
 
             // Remove the old photo from the images collection
             List<FileDB> images = announcement.getImages();
-            images.removeIf(image -> image.getId().equals(oldPhotoId));
-            announcement.setImages(images);
+            List<FileDB> imagesR = new ArrayList<>();
+            for (FileDB image : images) {
+                if (!image.getId().equals(oldPhotoId)){
+                    imagesR.add(image);
+                }
+            }
+            announcement.setImages(imagesR);
+            annoncementCollocationRepository.save(announcement);
+            fileDBRepository.deleteById(oldPhotoId);
+            //images.removeIf(image -> image.getId().equals(oldPhotoId));
 
             // Save the updated announcement
-            annoncementCollocationRepository.save(announcement);
+             return imagesR;
         } else {
             // Handle error: Announcement not found
             throw new NoSuchElementException("Announcement not found");

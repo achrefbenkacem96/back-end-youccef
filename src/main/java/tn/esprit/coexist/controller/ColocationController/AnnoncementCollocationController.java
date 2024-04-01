@@ -185,24 +185,24 @@ public class AnnoncementCollocationController {
 
         AnnoncementCollocation annc = new ObjectMapper().readValue(annoncement, AnnoncementCollocation.class);
 
+            List<FileDB> images = new ArrayList<>();
         if (oldPhotosIds != null && !oldPhotosIds.isEmpty()) {
             for (String oldPhotoId : oldPhotosIds) {
                 // Perform deletion logic for old photos with the provided IDs
                 // Assuming you have a service method to handle this
-                annoncementCollocationServiceImp.deleteOldPhoto(id, oldPhotoId);
+                images = annoncementCollocationServiceImp.deleteOldPhoto(id, oldPhotoId);
             }
         }
 
         if (files != null && !files.isEmpty()) {
-            List<FileDB> images = new ArrayList<>();
             for (MultipartFile file : files) {
                 FileDB image = fileStorageService.store(file, annc);
                 images.add(image);
             }
-            annc.setImages(images);
+
         }
 
-        return annoncementCollocationServiceImp.update(id, annc);
+        return annoncementCollocationServiceImp.update(id, annc, images);
     }
 
     @DeleteMapping("/deleteAnnoncementCollocation/{id}")
